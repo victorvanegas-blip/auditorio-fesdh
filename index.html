@@ -133,6 +133,7 @@
         </div>
     </main>
 
+    <header class="bg-gray-850 text-white px-6 py-6 shadow-md text-center">
     <footer class="bg-gray-800 text-gray-400 text-center py-4 text-xs border-t border-gray-700 mt-8 space-y-1">
         <p>© 2026 Facultad de Educación Social y Desarrollo Humano - UDELAS. Todos los derechos reservados.</p>
         <p class="text-gray-500 tracking-wide">
@@ -141,7 +142,8 @@
     </footer>
 
     <script>
-        const API_BASE_URL = "https://servidor-auditorio.onrender.com"; 
+        // URL de producción vinculada a tu backend de Render
+        const API_BASE_URL = "https://auditorio-backend.onrender.com"; 
 
         function generarOpcionesHoras() {
             const comboIn = document.getElementById('hora_inicio'), comboFin = document.getElementById('hora_fin');
