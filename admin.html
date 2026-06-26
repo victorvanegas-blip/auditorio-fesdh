@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Control - Auditorio Roy Tejeira</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen font-sans flex flex-col justify-between">
+
+    <div>
+        <header class="bg-slate-800 border-b border-slate-700 p-5 shadow-xl">
+            <div class="container mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div class="flex items-center gap-4 w-full sm:w-auto">
+                    <div class="flex gap-2 bg-white p-1.5 rounded-xl shadow-inner hidden sm:flex">
+                        <img src="logo-udelas.png" alt="Logo UDELAS" class="h-10 w-auto object-contain">
+                        <img src="logo-fesdh.png" alt="Logo FESDH" class="h-10 w-auto object-contain">
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold text-blue-400">🛡️ Control: Auditorio Roy Tejeira</h1>
+                        <p class="text-xs text-slate-400 mt-1" id="welcome-user">Edificio 803 - FESDH | Validando acceso seguro...</p>
+                    </div>
+                </div>
+                <span class="bg-emerald-500/10 text-emerald-400 text-xs px-3 py-1 rounded-full border border-emerald-500/20 shadow-sm font-mono whitespace-nowrap">Conexión Encriptada</span>
+            </div>
+        </header>
+
+        <main class="container mx-auto p-4 md:p-6 max-w-7xl space-y-8">
+            
+            <div id="gestion-directa" class="bg-slate-800 rounded-2xl border border-slate-700 p-6 shadow-2xl hidden">
+                <h2 class="text-lg font-bold text-slate-200 border-b border-slate-700 pb-3 mb-4">📝 Solicitud Recibida por Alerta</h2>
+                <div id="detalle-solicitud-contenido" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+                <div class="mt-6 pt-4 border-t border-slate-700 flex flex-col sm:flex-row gap-4 justify-end">
+                    <div class="w-full sm:w-72">
+                        <input id="motivo-rechazo" type="text" placeholder="Escribe la razón si vas a rechazar..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-red-500">
+                    </div>
+                    <div class="flex gap-3">
+                        <button onclick="procesarAccion('Rechazado')" class="bg-rose-600 hover:bg-rose-700 text-white font-bold px-6 py-2.5 rounded-xl text-sm transition cursor-pointer">Rechazar</button>
+                        <button onclick="procesarAccion('Aprobado')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-6 py-2.5 rounded-xl text-sm transition cursor-pointer">Aprobar Reserva</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-slate-800 rounded-2xl border border-slate-700 shadow-2xl overflow-hidden">
+                <div class="p-5 border-b border-slate-700 bg-slate-800/50 flex justify-between items-center">
+                    <h2 class="font-bold text-slate-200">Historial y Control de Operaciones</h2>
+                    <span class="text-xs text-slate-400 bg-slate-900 px-3 py-1 rounded-md" id="contador-solicitudes">Sincronizando...</span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead>
+                            <tr class="bg-slate-900 text-slate-400 text-xs uppercase border-b border-slate-700">
+                                <th class="p-4">Código</th>
+                                <th class="p-4">Solicitante</th>
+                                <th class="p-4">Actividad / Institución</th>
+                                <th class="p-4">Fecha y Bloque</th>
+                                <th class="p-4">Documento</th>
+                                <th class="p-4 text-center">Estado</th>
+                                <th class="p-4">Gestionado Por</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-cuerpo" class="divide-y divide-slate-700/50">
+                            <tr><td colspan="7" class="p-6 text-center text-slate-500">Cargando registros...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="seccion-admin-correos" class="grid grid-cols-1 md:grid-cols-3 gap-6 hidden">
+                <div class="bg-slate-800 rounded-2xl border border-slate-700 p-5 shadow-xl">
+                    <h3 class="font-bold text-slate-200 mb-3">➕ Autorizar Nuevo Encargado</h3>
+                    <form id="form-encargado" onsubmit="agregarEncargado(event)" class="space-y-3 text-xs">
+                        <div>
+                            <label class="block text-slate-400 mb-1">Nombre Completo</label>
+                            <input id="enc-nombre" type="text" required placeholder="Ej: Lic. Sucesor Técnico" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-slate-400 mb-1">Correo Institucional</label>
+                            <input id="enc-correo" type="email" required placeholder="usuario@udelas.ac.pa" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-slate-400 mb-1">Llave o Token de Acceso Web Único</label>
+                            <input id="enc-token" type="text" required placeholder="Ej: token_secreto_sucesor" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white font-mono focus:outline-none">
+                        </div>
+                        <div class="flex items-center gap-2 bg-slate-900/50 p-2.5 rounded-lg border border-slate-700/50 mt-1">
+                            <input id="enc-admin" type="checkbox" class="w-4 h-4 text-blue-600 bg-slate-900 border-slate-700 rounded focus:ring-blue-500 cursor-pointer">
+                            <label for="enc-admin" class="text-slate-300 font-medium cursor-pointer">¿Asignar como Administrador Global? <br><span class="text-[10px] text-slate-500 font-normal">Podrá administrar esta lista de personal.</span></label>
+                        </div>
+                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-lg transition text-sm cursor-pointer mt-2">Guardar Autorización</button>
+                    </form>
+                </div>
+
+                <div class="bg-slate-800 rounded-2xl border border-slate-700 p-5 shadow-xl md:col-span-2">
+                    <h3 class="font-bold text-slate-200 mb-3">👥 Lista de Personal con Alertas Activas</h3>
+                    <div class="overflow-x-auto text-xs">
+                        <table class="w-full text-left">
+                            <thead>
+                                <tr class="bg-slate-900 text-slate-400 text-[10px] uppercase border-b border-slate-700">
+                                    <th class="p-3">Nombre</th>
+                                    <th class="p-3">Correo</th>
+                                    <th class="p-3">Token Seguro</th>
+                                    <th class="p-3 text-center">Operación</th>
+                                </tr>
+                            </thead>
+                            <tbody id="lista-encargados-cuerpo" class="divide-y divide-slate-700/50"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <footer class="bg-slate-950 text-slate-500 text-center py-4 text-xs border-t border-slate-800 mt-12">
+        <div class="container mx-auto px-4">
+            <p>© 2026 Auditorio Roy Tejeira (Edif. 803) - FESDH UDELAS.</p>
+            <p class="text-blue-500/60 mt-1 font-mono">Desarrollado por el <span class="text-blue-400 font-semibold">Ing. Víctor Vanega</span></p>
+        </div>
+    </footer>
+
+    <script>
+        const API_BASE_URL = "https://servidor-auditorio.onrender.com"; 
+        const urlParams = new URLSearchParams(window.location.search);
+        const tokenEncargado = urlParams.get('token');
+        const codigoSolicitud = urlParams.get('solicitud');
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (!tokenEncargado) {
+                document.body.innerHTML = `<div class="flex items-center justify-center min-h-screen bg-slate-950 text-rose-400 font-bold p-6 text-center">🛑 Acceso Denegado: Enlace sin credenciales seguras.</div>`;
+                return;
+            }
+            await inicializarPanel();
+        });
+
+        async function inicializarPanel() {
+            try {
+                let res = await fetch(`${API_BASE_URL}/api/admin/reservas?token=${tokenEncargado}`);
+                if(res.status === 403) {
+                    document.body.innerHTML = `<div class="flex items-center justify-center min-h-screen bg-slate-950 text-rose-400 font-bold p-6 text-center">🛑 Token inválido o revocado.</div>`;
+                    return;
+                }
+                let reservas = await res.json();
+                pintarTablaReservas(reservas);
+
+                if (codigoSolicitud) {
+                    let solicitudData = reservas.find(r => r.codigo_seguimiento === codigoSolicitud);
+                    if(solicitudData && solicitudData.estado === 'Pendiente') {
+                        document.getElementById('gestion-directa').classList.remove('hidden');
+                        pintarDetalleSolicitud(solicitudData);
+                    }
+                }
+
+                let resEnc = await fetch(`${API_BASE_URL}/api/admin/encargados?token=${tokenEncargado}`);
+                if (resEnc.ok) {
+                    document.getElementById('seccion-admin-correos').classList.remove('hidden');
+                    let encargados = await resEnc.json();
+                    pintarTablaEncargados(encargados);
+                    
+                    // Buscar el nombre del usuario conectado de forma dinámica
+                    let usuarioActual = encargados.find(e => e.token_secreto === tokenEncargado);
+                    if (usuarioActual) {
+                        document.getElementById('welcome-user').innerText = `👋 Bienvenido: ${usuarioActual.nombre}`;
+                    }
+                } else {
+                    document.getElementById('welcome-user').innerText = "Conectado como Encargado de la Facultad";
+                }
+                
+            } catch (err) {
+                document.getElementById('contador-solicitudes').innerText = "Error de conexión.";
+            }
+        }
+
+        function pintarTablaReservas(reservas) {
+            document.getElementById('contador-solicitudes').innerText = `${reservas.length} registros cargados`;
+            const tbody = document.getElementById('tabla-cuerpo');
+            if(reservas.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-500">No hay trámites registrados aún.</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = reservas.map(r => `
+                <tr class="hover:bg-slate-700/30 transition">
+                    <td class="p-4 font-mono font-bold text-blue-400">${r.codigo_seguimiento}</td>
+                    <td class="p-4"><strong>${r.solicitante_nombre}</strong><br><span class="text-xs text-slate-400">${r.solicitante_correo}</span></td>
+                    <td class="p-4">${r.evento_nombre}<br><span class="text-xs text-slate-400">${r.evento_organizacion}</span></td>
+                    <td class="p-4">${r.fecha_evento}<br><span class="text-xs text-slate-500">${r.hora_inicio.substring(0,5)} a ${r.hora_fin.substring(0,5)}</span></td>
+                    <td class="p-4"><a href="${r.nota_url}" target="_blank" class="text-amber-400 hover:underline">👁️ Ver Nota Decano</a></td>
+                    <td class="p-4 text-center">
+                        <span class="px-2 py-1 rounded-full text-xs font-bold ${r.estado === 'Aprobado' ? 'bg-emerald-500/10 text-emerald-400' : r.estado === 'Rechazado' ? 'bg-rose-500/10 text-rose-400' : 'bg-amber-500/10 text-amber-400'}">${r.estado}</span>
+                    </td>
+                    <td class="p-4 text-slate-400 text-xs">${r.gestionado_por || '—'}</td>
+                </tr>
+            `).join('');
+        }
+
+        function pintarDetalleSolicitud(r) {
+            document.getElementById('detalle-solicitud-contenido').innerHTML = `
+                <div class="p-4 bg-slate-900 rounded-xl space-y-1.5 border border-slate-700/60">
+                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Detalles del Evento</p>
+                    <p class="text-base text-blue-400 font-bold">${r.evento_nombre}</p>
+                    <p class="text-xs"><strong>Organiza:</strong> ${r.evento_organizacion}</p>
+                    <p class="text-xs"><strong>Fecha:</strong> ${r.fecha_evento} | <strong>Horario:</strong> ${r.hora_inicio.substring(0,5)} a ${r.hora_fin.substring(0,5)}</p>
+                </div>
+                <div class="p-4 bg-slate-900 rounded-xl space-y-1.5 border border-slate-700/60">
+                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Datos del Solicitante</p>
+                    <p class="text-sm font-bold text-slate-200">${r.solicitante_nombre} (${r.solicitante_tipo})</p>
+                    <p class="text-xs text-slate-300">Ced/RUC: ${r.solicitante_cedula_ruc}</p>
+                    <p class="text-xs mt-2"><a href="${r.nota_url}" target="_blank" class="text-amber-400 font-bold hover:underline">📄 Abrir Documento Adjunto</a></p>
+                </div>
+            `;
+        }
+
+        async function procesarAccion(nuevoEstado) {
+            const motivo = document.getElementById('motivo-rechazo').value.trim();
+            if (nuevoEstado === 'Rechazado' && !motivo) return alert("⚠️ Es obligatorio escribir un motivo si vas a rechazar.");
+
+            let form = new FormData();
+            form.append("token", tokenEncargado);
+            form.append("codigo", codigoSolicitud);
+            form.append("nuevo_estado", nuevoEstado);
+            if(motivo) form.append("motivo", motivo);
+
+            try {
+                let res = await fetch(`${API_BASE_URL}/api/admin/procesar`, { method: 'POST', body: form });
+                if(res.ok) {
+                    alert(`Trámite finalizado: Reserva ${nuevoEstado}`);
+                    window.location.search = `?token=${tokenEncargado}`;
+                }
+            } catch (err) { alert("Error al procesar la acción."); }
+        }
+
+        function pintarTablaEncargados(lista) {
+            document.getElementById('lista-encargados-cuerpo').innerHTML = lista.map(e => `
+                <tr class="hover:bg-slate-700/20 transition text-slate-300">
+                    <td class="p-3 font-bold">${e.nombre} ${e.es_admin ? '<span class="text-[10px] bg-blue-500/10 text-blue-400 px-1.5 py-0.5 rounded-md ml-1">Admin Global</span>' : ''}</td>
+                    <td class="p-3">${e.correo}</td>
+                    <td class="p-3 font-mono text-blue-400">${e.token_secreto}</td>
+                    <td class="p-3 text-center">
+                        <button onclick="eliminarEncargado(${e.id}, '${e.nombre}')" class="text-rose-400 hover:underline font-bold cursor-pointer">Quitar</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function agregarEncargado(e) {
+            e.preventDefault();
+            let form = new FormData();
+            form.append("token_admin", tokenEncargado);
+            form.append("nombre", document.getElementById('enc-nombre').value.trim());
+            form.append("correo", document.getElementById('enc-correo').value.trim());
+            form.append("token", document.getElementById('enc-token').value.trim());
+            form.append("es_admin", document.getElementById('enc-admin').checked);
+
+            try {
+                let res = await fetch(`${API_BASE_URL}/api/admin/encargados`, { method: 'POST', body: form });
+                if(res.ok) {
+                    alert("Nuevo encargado guardado y autorizado.");
+                    document.getElementById('form-encargado').reset();
+                    inicializarPanel();
+                }
+            } catch (err) { alert("Error al registrar."); }
+        }
+
+        async function eliminarEncargado(id, nombre) {
+            if(!confirm(`¿Estás seguro de quitar los permisos de acceso y alertas a ${nombre}?`)) return;
+            try {
+                let res = await fetch(`${API_BASE_URL}/api/admin/encargados/${id}?token_admin=${tokenEncargado}`, { method: 'DELETE' });
+                if(res.ok) {
+                    alert("Permisos revocados con éxito.");
+                    inicializarPanel();
+                }
+            } catch (err) { alert("Error al eliminar."); }
+        }
+    </script>
+</body>
+</html>
