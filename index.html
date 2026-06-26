@@ -133,7 +133,6 @@
         </div>
     </main>
 
-    <header class="bg-gray-850 text-white px-6 py-6 shadow-md text-center">
     <footer class="bg-gray-800 text-gray-400 text-center py-4 text-xs border-t border-gray-700 mt-8 space-y-1">
         <p>© 2026 Facultad de Educación Social y Desarrollo Humano - UDELAS. Todos los derechos reservados.</p>
         <p class="text-gray-500 tracking-wide">
@@ -142,13 +141,11 @@
     </footer>
 
     <script>
-        // URL de producción vinculada a tu backend de Render
         const API_BASE_URL = "https://auditorio-backend.onrender.com"; 
 
         function generarOpcionesHoras() {
             const comboIn = document.getElementById('hora_inicio'), comboFin = document.getElementById('hora_fin');
             
-            // Llenar combo de Inicio (7:00 AM a 6:00 PM)
             for(let h=7; h<=18; h++) {
                 ['00', '30'].forEach(m => {
                     if (h === 18 && m === '30') return; 
@@ -161,7 +158,6 @@
                 });
             }
 
-            // Llenar combo de Finalización (7:30 AM a 9:00 PM)
             for(let h=7; h<=21; h++) {
                 ['00', '30'].forEach(m => {
                     if (h === 7 && m === '00') return; 
@@ -215,7 +211,6 @@
             });
             calendar.render();
 
-            // LÓGICA PARA VERIFICAR EL ESTADO POR TOKEN
             document.getElementById('btn-consultar').addEventListener('click', async function() {
                 const token = document.getElementById('token-busqueda').value.trim();
                 const resultadoDiv = document.getElementById('resultado-status');
@@ -262,9 +257,15 @@
                 }
             });
 
-            // LÓGICA DE ENVÍO DE FORMULARIO
             document.getElementById('form-reserva').addEventListener('submit', async function(e) {
                 e.preventDefault();
+                
+                // Validación para asegurar que se ha seleccionado una fecha del calendario
+                if (!document.getElementById('fecha').value) {
+                    alert("Por favor, selecciona una fecha válida haciendo clic sobre el calendario.");
+                    return;
+                }
+
                 const formData = new FormData(this);
                 try {
                     const respuesta = await fetch(`${API_BASE_URL}/api/solicitar`, { method: 'POST', body: formData });
